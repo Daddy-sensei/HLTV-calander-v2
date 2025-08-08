@@ -1,0 +1,10 @@
+{
+  "name": "vercel-hltv-team-ics",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "hltv": "^3.9.0",
+    "ical-generator": "^7.0.0"
+  }
+}
