@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HLTV Team → iCal</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; line-height: 1.5; }
+    input, button { font-size: 1rem; padding: .6rem .8rem; }
+    input { width: 100%; max-width: 520px; }
+    .row { margin: 1rem 0; }
+    code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: #f5f5f5; padding: .2rem .4rem; border-radius: 4px; }
+    .hint { color: #555; }
+    .link { margin-top: .6rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .5rem; }
+    .team { border: 1px solid #eee; border-radius: 8px; padding: .6rem .8rem; cursor: pointer; background: #fafafa; }
+    .team:hover { background: #f0f0f0; }
+    .small { font-size: .85rem; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>HLTV Team → iCal</h1>
+  <p>Paste a team's HLTV URL or numeric ID to get a live-updating <span class="mono">.ics</span> link.</p>
+  <div class="row">
+    <input id="input" placeholder="e.g. https://www.hltv.org/team/9565/vitality or just 9565" />
+  </div>
+  <div class="row">
+    <button id="btn">Create .ics link</button>
+  </div>
+  <div id="out" class="link"></div>
+
+  <h2>Popular teams</h2>
+  <p class="small">Click a team to generate its feed link. If one doesn’t work, open the team on HLTV and paste the URL above.</p>
+  <div class="grid" id="teams"></div>
+
+  <p class="hint">Event title format is <strong>Team / Opponent</strong>. Durations: Bo1=1h, Bo3=3h, Bo5=5h.</p>
+  <script>
+    const base = typeof window !== 'undefined' ? window.location.origin : ''
+    const input = document.getElementById('input')
+    const out = document.getElementById('out')
+
+    function makeLinkFromValue(val) {
+      const idMatch = (val || '').trim().match(/(\d{3,7})/)
+      if (!idMatch) return null
+      return `${base}/api/team/${idMatch[1]}.ics`
+    }
+
+    function showLink(url) {
+      out.innerHTML = `Your feed: <a href="${url}"><code>${url}</code></a>`
+    }
+
+    document.getElementById('btn').addEventListener('click', () => {
+      const url = makeLinkFromValue(input.value)
+      if (!url) { out.textContent = 'Please paste a numeric team id or a valid HLTV team URL.'; return }
+      showLink(url)
+    })
+
+    const popular = [
+      { name: 'Astralis', url: 'https://www.hltv.org/team/6665/astralis' },
+      { name: 'Vitality', url: 'https://www.hltv.org/team/9565/vitality' },
+      { name: 'G2', url: 'https://www.hltv.org/team/5995/g2' },
+      { name: 'Natus Vincere', url: 'https://www.hltv.org/team/4608/natus-vincere' },
+      { name: 'FaZe', url: 'https://www.hltv.org/team/6667/faze' },
+      { name: 'MOUZ', url: 'https://www.hltv.org/team/4494/mouz' },
+      { name: 'Heroic', url: 'https://www.hltv.org/team/7175/heroic' },
+      { name: 'Team Liquid', url: 'https://www.hltv.org/team/5973/liquid' },
+      { name: 'Fnatic', url: 'https://www.hltv.org/team/4991/fnatic' },
+      { name: 'Cloud9', url: 'https://www.hltv.org/team/5752/cloud9' }
+    ]
+
+    const teamsEl = document.getElementById('teams')
+    popular.forEach(t => {
+      const div = document.createElement('div')
+      div.className = 'team'
+      div.textContent = t.name
+      div.addEventListener('click', () => {
+        input.value = t.url
+        const link = makeLinkFromValue(t.url)
+        if (link) showLink(link)
+      })
+      teamsEl.appendChild(div)
+    })
+  </script>
+</body>
+</html>
